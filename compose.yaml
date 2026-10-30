@@ -1,0 +1,133 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: morrow
+      POSTGRES_USER: morrow
+      POSTGRES_PASSWORD: local-dev-only
+    ports:
+      - "5432:5432"
+    volumes:
+      - morrow-postgres:/var/lib/postgresql/data
+      - ./backend/postgres-init.sql:/docker-entrypoint-initdb.d/10-commerce-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U morrow -d morrow"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  dashboard-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/dashboard-service
+        ARTIFACT: dashboard-service
+    environment:
+      SERVER_PORT: 8090
+      CUSTOMER_SERVICE_URL: http://customer-service:8081
+      INVENTORY_SERVICE_URL: http://inventory-service:8082
+      ORDER_SERVICE_URL: http://order-service:8083
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+    depends_on: [customer-service, inventory-service, order-service, payment-service]
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/api-gateway
+        ARTIFACT: api-gateway
+    environment:
+      CUSTOMER_SERVICE_URL: http://customer-service:8081
+      INVENTORY_SERVICE_URL: http://inventory-service:8082
+      ORDER_SERVICE_URL: http://order-service:8083
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+      MARKET_SERVICE_URL: http://market-service:8085
+      DASHBOARD_SERVICE_URL: http://dashboard-service:8090
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dashboard-service
+      - customer-service
+      - inventory-service
+      - order-service
+      - payment-service
+      - market-service
+  customer-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/customer-service
+        ARTIFACT: customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/customers
+      DATABASE_USERNAME: morrow
+      DATABASE_PASSWORD: local-dev-only
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  inventory-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/inventory-service
+        ARTIFACT: inventory-service
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/inventory
+      DATABASE_USERNAME: morrow
+      DATABASE_PASSWORD: local-dev-only
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  order-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/order-service
+        ARTIFACT: order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/orders
+      DATABASE_USERNAME: morrow
+      DATABASE_PASSWORD: local-dev-only
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  payment-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/payment-service
+        ARTIFACT: payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/payments
+      DATABASE_USERNAME: morrow
+      DATABASE_PASSWORD: local-dev-only
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  market-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service
+      args:
+        MODULE: services/market-service
+        ARTIFACT: market-service
+    ports:
+      - "8085:8085"
+volumes:
+  morrow-postgres:
