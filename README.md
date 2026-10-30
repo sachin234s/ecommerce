@@ -1,4 +1,4 @@
-# Morrow Commerce
+# NexaCart
 
 An India-first, multi-market ecommerce starter in a separate project from the
 calculator. It contains a Vue operations dashboard and a Java 17 / Maven

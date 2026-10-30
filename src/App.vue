@@ -229,14 +229,14 @@ const primaryAction = computed(() => ({
 <template>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="#" aria-label="Morrow Commerce home" @click.prevent="activeView = 'Overview'">
+      <a class="brand" href="#" aria-label="NexaCart home" @click.prevent="activeView = 'Overview'">
         <span class="brand-symbol"><span></span><span></span><span></span><span></span></span>
-        <span class="brand-name">morrow<span>.</span></span>
+        <span class="brand-name">nexa<span>.</span></span>
       </a>
 
       <div class="workspace-switcher">
-        <div class="workspace-logo">M</div>
-        <div class="workspace-copy"><strong>Morrow Studio</strong><span>Commerce workspace</span></div>
+        <div class="workspace-logo">N</div>
+        <div class="workspace-copy"><strong>NexaCart Studio</strong><span>Commerce workspace</span></div>
         <span class="switcher-chevron">⌄</span>
       </div>
 
@@ -345,7 +345,7 @@ const primaryAction = computed(() => ({
           <section class="architecture-footnote"><span>Six independently runnable Spring Boot services; payment integration and event streaming are sandbox/planned.</span><span>SPRING BOOT <i>·</i> JAVA 17 <i>·</i> MAVEN <i>·</i> POSTGRESQL</span></section>
         </template>
 
-        <footer class="app-footer"><span>© 2026 Morrow Commerce</span><span><i class="footer-status" :class="{ offline: apiError }"></i> {{ apiError ? 'API disconnected' : 'API connected' }} <b>·</b> v0.1.0</span><a href="#" @click.prevent="activeView = 'Architecture'">Platform architecture ↗</a></footer>
+        <footer class="app-footer"><span>© 2026 NexaCart</span><span><i class="footer-status" :class="{ offline: apiError }"></i> {{ apiError ? 'API disconnected' : 'API connected' }} <b>·</b> v0.1.0</span><a href="#" @click.prevent="activeView = 'Architecture'">Platform architecture ↗</a></footer>
       </div>
     </main>
     <div v-if="showCreateDialog" class="modal-backdrop" @click.self="showCreateDialog = false">
